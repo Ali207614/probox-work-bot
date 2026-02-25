@@ -1,6 +1,6 @@
-import { Types } from 'mongoose';
-import {Document} from "node-telegram-bot-api";
-import {IMenuOptions} from "./keyboards.types";
+import type { Types } from 'mongoose';
+import type { Document } from 'node-telegram-bot-api';
+import type { IMenuOptions } from './keyboards.types';
 
 export interface ISelect {
   pagination?: { prev: number; next: number };
@@ -13,15 +13,6 @@ export interface ISelect {
   branchTime?: string;
   branchImage?: { file_id: string }[];
   updateBranchId?: number;
-  couponBranchId?: number;
-  couponCode?: string;
-  couponStartDate?: Date;
-  couponEndDate?: Date;
-  couponUserId?: number;
-  couponId?: Types.ObjectId | undefined;
-  winnerId?: Types.ObjectId;
-  winnerText?: string;
-  smsSent?: boolean;
   selectBranchId?: Types.ObjectId | undefined;
   branchesList?: {
     branchId: number;
@@ -53,12 +44,13 @@ export interface IUser extends Document {
   admin?: boolean;
   status?: boolean;
   lastMessageId?: number;
-  coupons?: {
-    code: string;
-    coupon: Types.ObjectId;
-    activatedAt: Date;
-    branchId: Types.ObjectId;
-  }[];
+
+  // SLP (menejer)
+  slpCode?: number | null;
+  slpName?: string | null;
+  slpRole?: string | null;
+  slpBranch?: string | null;
+
   createdAt: Date;
   updatedAt: Date;
 }

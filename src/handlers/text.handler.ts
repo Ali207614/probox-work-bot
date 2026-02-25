@@ -322,7 +322,6 @@ Language : ${coupon.userId.language || '-'}
       );
       await updateUser(chat_id, {
         user_step: 91,
-        select: { couponId: coupon._id, winnerId: coupon.userId._id },
       });
     },
     middleware: ({ user }: BotContext): boolean => get(user, 'user_step') === 90,

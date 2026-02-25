@@ -1,6 +1,6 @@
-import { Message } from 'node-telegram-bot-api';
-import TelegramBot from 'node-telegram-bot-api';
-import { IUser } from '../types/user.types';
+import type { Message } from 'node-telegram-bot-api';
+import type TelegramBot from 'node-telegram-bot-api';
+import type { IUser } from './user.types';
 
 export interface BotContext {
   chat_id: number;
@@ -33,5 +33,3 @@ export interface HandlerRegistry {
   textHandlers: ActionTree;
   stepHandlers: ActionTree;
 }
-
-

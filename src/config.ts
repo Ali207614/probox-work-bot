@@ -10,6 +10,6 @@ const bot = new TelegramBot(
 
 export const config = {
   bot,
-  mongoURI: process.env.MONGO_URI ?? 'mongodb://localhost:27017/yutuqliqadam_db',
+  mongoURI: process.env.MONGO_URI ?? 'mongodb://localhost:27017/probox_work_db',
   personalChatId: process.env.PERSONAL_CHAT_ID ?? '',
 };

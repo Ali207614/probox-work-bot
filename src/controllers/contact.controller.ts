@@ -1,53 +1,62 @@
-import { Message } from 'node-telegram-bot-api';
-import TelegramBot from 'node-telegram-bot-api';
-import { get } from 'lodash';
+import type { Message } from 'node-telegram-bot-api';
+import type TelegramBot from 'node-telegram-bot-api';
 import { User } from '../models/user.model';
 import { sendMessageHelper, updateStep } from '../utils/helper';
-import { option, userBtn } from '../keyboards/keyboards';
+import { option } from '../keyboards/keyboards';
+import { HanaService } from '../sap/hana.service';
 import i18n from '../utils/i18n';
-
+import { SapService } from '../sap/sap-hana.service';
 
 export class ContactController {
-  async handle(bot: TelegramBot, msg: Message, chat_id: number): Promise<void> {
+  private readonly sapService: SapService;
+
+  constructor() {
+    this.sapService = new SapService(new HanaService());
+  }
+
+  async handle(bot: TelegramBot, msg: Message, chatId: number): Promise<void> {
     try {
-      const user = await User.findOne({ chat_id });
+      const phone = msg.contact?.phone_number?.replace(/\D/g, '');
 
-      if (!user) {
-        await bot.sendMessage(chat_id, i18n.__('messages.error'));
+      if (!phone) {
+        await sendMessageHelper(chatId, i18n.__('messages.phone_invalid'), option);
         return;
       }
 
-      const phoneNumber = get(msg, 'contact.phone_number', '').replace(/\D/g, '');
-      if (!phoneNumber) {
-        await sendMessageHelper(chat_id, i18n.__('messages.phone_invalid'), option);
+      const loadingMsg = await sendMessageHelper(chatId, i18n.__('messages.loading'));
+
+      // SAP dan menejer tekshirish
+      const slp = await this.sapService.getSlpByPhone(phone);
+
+      if (!slp) {
+        await bot.deleteMessage(chatId, loadingMsg.message_id);
+        await sendMessageHelper(chatId, i18n.__('messages.slp_not_found'), option);
         return;
       }
 
-      if (!get(user, 'phone')) {
-        const deleteMessage = await sendMessageHelper(chat_id, i18n.__('messages.loading'));
+      // User yaratish yoki yangilash (upsert)
+      await User.findOneAndUpdate(
+        { chat_id: chatId },
+        {
+          chat_id: chatId,
+          phone,
+          fullName: slp.SlpName,
+          language: 'uz',
+          slpCode: slp.SlpCode,
+          slpName: slp.SlpName,
+          slpRole: slp.U_role,
+          slpBranch: slp.U_branch,
+          status: true,
+        },
+        { upsert: true, new: true },
+      );
 
-        await User.findOneAndUpdate(
-          { chat_id },
-          {
-            phone: phoneNumber,
-            fullName: get(user, 'fullName', ''),
-            language: get(user, 'language', '').toLowerCase(),
-          },
-        );
-
-        await bot.deleteMessage(chat_id, deleteMessage.message_id);
-
-        await sendMessageHelper(chat_id, i18n.__('messages.login_success'), userBtn());
-        await updateStep(chat_id, 10);
-        return;
-      }
-
-      await User.findOneAndUpdate({ chat_id }, { phone: phoneNumber });
-
-      await sendMessageHelper(chat_id, i18n.__('messages.phone_changed_done'));
+      await bot.deleteMessage(chatId, loadingMsg.message_id);
+      await sendMessageHelper(chatId, i18n.__('messages.login_success'));
+      await updateStep(chatId, 10);
     } catch (err) {
       console.error('ContactController error:', err);
-      await sendMessageHelper(chat_id, i18n.__('messages.error'));
+      await sendMessageHelper(chatId, i18n.__('messages.error'));
     }
   }
 }

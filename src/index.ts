@@ -72,6 +72,7 @@ export async function startBot(): Promise<void> {
         const chatId = msg.chat.id;
         await contactController.handle(bot, msg, chatId);
       } catch (err) {
+        console.log(err);
         console.error('Contact handler error:', err);
         sendError(bot, err);
       }

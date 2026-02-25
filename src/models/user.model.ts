@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { IUser } from '../types/user.types';
+import type { IUser } from '../types/user.types';
 
 const userSchema = new Schema<IUser>(
   {
@@ -13,19 +13,18 @@ const userSchema = new Schema<IUser>(
     admin: { type: Boolean, default: false },
     status: { type: Boolean, default: false },
     lastMessageId: { type: Number },
-    coupons: [
-      {
-        code: { type: String, required: true },
-        coupon: { type: Schema.Types.ObjectId, ref: 'Coupon', required: true },
-        activatedAt: { type: Date, default: Date.now },
-        branchId: { type: Schema.Types.ObjectId, ref: 'Branch', required: true },
-      },
-    ],
+
+    // SLP (menejer)
+    slpCode: { type: Number, default: null },
+    slpName: { type: String, default: null },
+    slpRole: { type: String, default: null },
+    slpBranch: { type: String, default: null },
   },
   { timestamps: true },
 );
 
 userSchema.index({ phone: 1 }, { sparse: true });
+userSchema.index({ slpCode: 1 }, { sparse: true });
 userSchema.index({ language: 1 });
 userSchema.index({ user_step: 1 });
 

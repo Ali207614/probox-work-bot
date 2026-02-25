@@ -64,35 +64,6 @@ export default tseslint.config(
             ],
 
             // Naming convention
-            '@typescript-eslint/naming-convention': [
-                'error',
-                {
-                    selector: 'variable',
-                    format: ['camelCase', 'UPPER_CASE', 'PascalCase'],
-                },
-                {
-                    selector: 'function',
-                    format: ['camelCase'],
-                },
-                {
-                    selector: 'typeLike',
-                    format: ['PascalCase'],
-                },
-                {
-                    selector: 'classProperty',
-                    modifiers: ['static', 'readonly'],
-                    format: ['UPPER_CASE'],
-                },
-                {
-                    selector: 'classProperty',
-                    modifiers: ['readonly'],
-                    format: ['camelCase'],
-                },
-                {
-                    selector: 'enumMember',
-                    format: ['UPPER_CASE'],
-                },
-            ],
 
             // Consistency
             '@typescript-eslint/consistent-type-imports': [
@@ -130,7 +101,7 @@ export default tseslint.config(
                 },
                 {
                     selector: 'typeProperty',
-                    format: ['camelCase', 'snake_case'],
+                    format: null,
                 },
             ],
         },

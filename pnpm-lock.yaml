@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@sap/hana-client':
+        specifier: ^2.27.23
+        version: 2.27.23
       '@types/i18n':
         specifier: ^0.13.12
         version: 0.13.12
@@ -312,6 +315,10 @@ packages:
     resolution: {integrity: sha512-QNqXyfVS2wm9hweSYD2O7F0G06uurj9kZ96TRQE5Y9hU7+tgdZwIkbAKc5Ocy1HxEY2kuDQa6cQ1WRs/O5LFKA==}
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
 
+  '@sap/hana-client@2.27.23':
+    resolution: {integrity: sha512-HFm6il8AUViABAPB1nGmvJm1v0YpIziOz5caYAHcMAG7iDKkfSaQ+7L9KBqrIykzbMBQq3lSeYYr/oIXqUTg5Q==}
+    engines: {node: '>=4.0.0'}
+
   '@types/caseless@0.12.5':
     resolution: {integrity: sha512-hWtVTC2q7hc7xZ/RLbxapMvDMgUnDvKvMOpKal4DrMyfGBUfB1oKaZlIRr6mJL+If3bAP6sV/QneGzF6tJjZDg==}
 
@@ -521,6 +528,14 @@ packages:
   data-view-byte-offset@1.0.1:
     resolution: {integrity: sha512-BS8PfmtDGnrgYdOonGZQdLZslWIeCGFP9tpan0hi1Co2Zr2NKADsvGYA8XxuG/4UWgJ6Cjtv+YJnB6MM69QGlQ==}
     engines: {node: '>= 0.4'}
+
+  debug@3.1.0:
+    resolution: {integrity: sha512-OX8XqP7/1a9cqkxYw2yXss15f26NKWBpDXQd0/uK/KPqdQhxbPa994hnzjcE2VqQpDslf55723cKPUOGSmMY3g==}
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
 
   debug@3.2.7:
     resolution: {integrity: sha512-CFjzYYAi4ThfiQvizrFQevTTXHtnCqWfe7x1AhgEscTz6ZbLbfoLRLPugTQyBth6f8ZERVUSyWHFD/7Wu4t1XQ==}
@@ -1086,6 +1101,9 @@ packages:
   mquery@6.0.0:
     resolution: {integrity: sha512-b2KQNsmgtkscfeDgkYMcWGn9vZI9YoXh802VDEwE6qc50zxBFQ0Oo8ROkawbPAsXCY1/Z1yp0MagqsZStPWJjw==}
     engines: {node: '>=20.19.0'}
+
+  ms@2.0.0:
+    resolution: {integrity: sha512-Tpp60P6IUJDTuOq/5Z8cdskzJujfwqfOTkrwIwj7IRISpnkJnT6SyJ4PCPnGMoFjC9ddhal5KVIYtAt97ix05A==}
 
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
@@ -1658,6 +1676,12 @@ snapshots:
 
   '@pkgr/core@0.2.9': {}
 
+  '@sap/hana-client@2.27.23':
+    dependencies:
+      debug: 3.1.0
+    transitivePeerDependencies:
+      - supports-color
+
   '@types/caseless@0.12.5': {}
 
   '@types/esrecurse@4.3.1': {}
@@ -1913,6 +1937,10 @@ snapshots:
       call-bound: 1.0.4
       es-errors: 1.3.0
       is-data-view: 1.0.2
+
+  debug@3.1.0:
+    dependencies:
+      ms: 2.0.0
 
   debug@3.2.7:
     dependencies:
@@ -2549,6 +2577,8 @@ snapshots:
   mpath@0.9.0: {}
 
   mquery@6.0.0: {}
+
+  ms@2.0.0: {}
 
   ms@2.1.3: {}
 
