@@ -1,13 +1,6 @@
 import { get } from 'lodash';
-import { Message } from 'node-telegram-bot-api';
-import { User } from '../models/user.model';
-import { sendMessageHelper, updateStep, updateUser } from '../utils/helper';
-import { buildKeyboard } from '../keyboards/inline.keyboards';
-import i18n from '../utils/i18n';
-import { BotContextWithData } from '../types/bot.types';
-import { Branch, IBranch } from '../models/branch.model';
-import { IUser } from '../types/user.types';
-import { Coupon } from '../models/coupon.model';
+import { sendMessageHelper, updateUser } from '../utils/helper';
+import type { BotContextWithData } from '../types/bot.types';
 
 export const callbackHandlers: Record<
   string,

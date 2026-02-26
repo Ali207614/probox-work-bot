@@ -1,38 +1,32 @@
-import type { Document } from 'mongoose';
-import { Schema, model } from 'mongoose';
+import { Schema, model, type Document, type Model } from 'mongoose';
 
-export interface IBranch {
-  branchId: number;
-  address: string;
-  location: { lat: number; lng: number };
+export interface IBranch extends Document {
+  id: number;
+  code: string;
   name: string;
-  supportPhone: string;
-  workingHours: string;
-  image: { file_id: string }[];
+  region?: string;
+  address?: string;
+  phone?: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export interface IBranchDocument extends IBranch, Document {}
-
-export type IBranchWithDistance = IBranch & { distance: number };
-
-const branchSchema = new Schema<IBranchDocument>(
+const BranchSchema = new Schema<IBranch>(
   {
-    branchId: { type: Number, required: true, unique: true },
-    address: { type: String, required: true },
-    location: {
-      lat: { type: Number, required: true },
-      lng: { type: Number, required: true },
+    id: { type: Number, required: true },
+    code: { type: String, required: true },
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+      // description: mongoose uchun real option emas, shuning uchun olib tashladim
     },
-    name: { type: String, required: true },
-    supportPhone: { type: String, required: false },
-    workingHours: { type: String },
-    image: [
-      {
-        file_id: { type: String, required: true },
-      },
-    ],
+    region: { type: String, trim: true },
+    address: { type: String, trim: true },
+    phone: { type: String, trim: true },
   },
   { timestamps: true },
 );
 
-export const Branch = model<IBranchDocument>('Branch', branchSchema);
+export const Branch: Model<IBranch> = model<IBranch>('Branch', BranchSchema);
+export { BranchSchema };

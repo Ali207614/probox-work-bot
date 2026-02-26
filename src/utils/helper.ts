@@ -3,7 +3,6 @@ import type TelegramBot from 'node-telegram-bot-api';
 import { config } from '../config';
 import { User } from '../models/user.model';
 import type { IBack, IUser } from '../types/user.types';
-import { Coupon } from '../models/coupon.model';
 import type { QueryFilter } from 'mongoose';
 
 export async function infoUser({ chat_id }: { chat_id: number }): Promise<IUser | null> {
@@ -20,22 +19,6 @@ export async function updateBack(
 
 export async function updateStep(chat_id: number, user_step = 1): Promise<void> {
   await User.updateOne({ chat_id }, { $set: { user_step } });
-}
-
-export async function searchUsersAll(query: string): Promise<IUser[]> {
-  const regex = new RegExp(query, 'i');
-
-  const coupon = await Coupon.findOne({ code: regex });
-
-  const filter: QueryFilter<IUser> = {
-    $or: [{ fullName: regex }, { phone: regex }],
-  };
-
-  if (coupon) {
-    (filter.$or as any[]).push({ 'coupons.coupon': coupon._id });
-  }
-
-  return User.find(filter).populate('coupons.coupon').lean<IUser[]>();
 }
 
 export async function updateUser(chat_id: number, userData: Partial<IUser>): Promise<void> {

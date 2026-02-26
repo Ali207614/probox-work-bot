@@ -1,5 +1,44 @@
 import i18n from '../utils/i18n';
 import type { IMenuOptions } from '../types/keyboards.types';
+import type { SendMessageOptions } from 'node-telegram-bot-api';
+
+export const mainMenuUz: SendMessageOptions = {
+  reply_markup: {
+    resize_keyboard: true,
+    keyboard: [[{ text: '📊 Umumiy hisobot' }]],
+  },
+};
+
+export const mainMenuRu: SendMessageOptions = {
+  reply_markup: {
+    resize_keyboard: true,
+    keyboard: [[{ text: '📊 Общий отчет' }], [{ text: '⬅️ Назад' }]],
+  },
+};
+
+/**
+ * lang: 'uz' | 'ru' (sizda boshqa bo'lsa ham ishlaydi)
+ * - null/undefined bo'lsa default: uz
+ */
+export function mainMenuByLang(lang?: string): SendMessageOptions {
+  const l = String(lang ?? '').toLowerCase();
+
+  if (l === 'ru' || l === 'rus' || l === 'russian') {
+    return mainMenuRu;
+  }
+
+  // default
+  return mainMenuUz;
+}
+
+export function userBtn(): SendMessageOptions {
+  return {
+    reply_markup: {
+      resize_keyboard: true,
+      keyboard: [[{ text: '📊 Umumiy hisobot' }]],
+    },
+  };
+}
 
 export const option: IMenuOptions = {
   parse_mode: 'Markdown',
@@ -26,18 +65,4 @@ export const adminBtn: IMenuOptions = {
       [{ text: 'Foydalanuvchilar excel' }],
     ],
   },
-};
-
-export const userBtn = (): IMenuOptions => {
-  return {
-    parse_mode: 'Markdown',
-    reply_markup: {
-      resize_keyboard: true,
-      keyboard: [
-        [{ text: i18n.__('menu.my_coupons') }, { text: i18n.__('menu.activate_coupon') }],
-        [{ text: i18n.__('menu.branches') }, { text: i18n.__('menu.contact') }],
-        [{ text: i18n.__('menu.settings') }],
-      ],
-    },
-  };
 };

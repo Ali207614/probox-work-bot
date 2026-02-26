@@ -1,16 +1,12 @@
 import { get } from 'lodash';
 import { User } from '../models/user.model';
 import { sendMessageHelper, updateBack, updateStep, updateUser } from '../utils/helper';
-import { userBtn, option, adminBtn } from '../keyboards/keyboards';
+import { userBtn, option } from '../keyboards/keyboards';
 import i18n from '../utils/i18n';
 import { buildKeyboard } from '../keyboards/inline.keyboards';
-import { Contact } from '../models/contact.model';
-import { Coupon } from '../models/coupon.model';
 import * as dotenv from 'dotenv';
-import escapeHTML from '../utils/escape-html';
 import type { BotContext } from '../types/bot.types';
 import type { Message, SendLocationOptions } from 'node-telegram-bot-api';
-import type { IUser } from '../types/user.types';
 
 dotenv.config();
 
@@ -44,84 +40,6 @@ export const textHandlers: Record<
       });
 
       await updateStep(chat_id, 4);
-    },
-  },
-  '11': {
-    middleware: ({ user }: BotContext): boolean => {
-      return get(user, 'user_step') === 11;
-    },
-    selfExecuteFn: async ({ chat_id, msgText, user, bot }: BotContext): Promise<void> => {
-      const deleteMessage: Message = await sendMessageHelper(chat_id, i18n.__('messages.loading'));
-      const GROUP_CHAT_ID = process.env.GROUP_CHAT_ID;
-
-      function escapeRegex(value: string): string {
-        return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      }
-
-      const couponCode: string = msgText.trim().toLowerCase();
-      const safeCode = escapeRegex(couponCode);
-
-      const coupon = await Coupon.findOne({
-        code: { $regex: new RegExp(`^${safeCode}$`, 'i') },
-        userId: null,
-      }).populate('branchId', 'name address');
-
-      if (!coupon) {
-        await bot.deleteMessage(chat_id, deleteMessage.message_id);
-        await sendMessageHelper(chat_id, i18n.__('messages.coupon_not_found'));
-        return;
-      }
-
-      coupon.userId = user._id;
-      coupon.activatedAt = new Date();
-      await coupon.save();
-
-      await Promise.all([
-        User.findOneAndUpdate(
-          { _id: user._id },
-          {
-            $push: {
-              coupons: {
-                code: coupon.code,
-                coupon: coupon._id,
-                activatedAt: coupon.activatedAt,
-                branchId: get(user, 'select.selectBranchId'),
-              },
-            },
-          },
-        ),
-        updateStep(chat_id, 12),
-      ]);
-
-      const message = i18n.__('messages.coupon_success', { coupon: coupon.code });
-      await bot.deleteMessage(chat_id, deleteMessage.message_id);
-      await sendMessageHelper(chat_id, message);
-
-      if (GROUP_CHAT_ID) {
-        try {
-          const infoMessage = `
-🍀 <b>Kupon aktivlashtirildi!</b>
-
-👤 <b>Foydalanuvchi:</b> ${escapeHTML(user.fullName) || 'Noma’lum'}
-📞 <b>Telefon:</b> ${escapeHTML(user.phone) || '—'}
-🕒 <b>Aktivlashtirilgan sana:</b> ${escapeHTML(coupon.activatedAt.toLocaleString('uz-UZ'))}
-
-💳 <b>Kupon kodi:</b> #${escapeHTML(coupon.code)}
-`;
-
-          await bot.sendMessage(GROUP_CHAT_ID, infoMessage, {
-            parse_mode: 'HTML',
-          });
-        } catch (err) {
-          console.error('Failed to send group notification:', err);
-          if (process.env.PERSONAL_CHAT_ID) {
-            await bot.sendMessage(
-              process.env.PERSONAL_CHAT_ID,
-              `⚠️ Group notification error: ${String(err)}`,
-            );
-          }
-        }
-      }
     },
   },
 
@@ -261,69 +179,5 @@ export const textHandlers: Record<
     middleware: ({ user }: BotContext): boolean => {
       return get(user, 'user_step') === 62 && get(user, 'admin') === true;
     },
-  },
-  '70': {
-    selfExecuteFn: async ({ chat_id, msgText }: BotContext): Promise<void> => {
-      await Contact.findOneAndUpdate({}, { $set: { text: msgText } });
-      await sendMessageHelper(chat_id, "Muvaffaqiyatli o'zgartirildi", adminBtn);
-      await updateStep(chat_id, 10);
-    },
-    middleware: ({ user }: BotContext): boolean => {
-      return get(user, 'user_step') === 70;
-    },
-  },
-
-  '30': {
-    selfExecuteFn: async ({ chat_id, msgText }: BotContext): Promise<void> => {
-      const coupon = await Coupon.findOneAndDelete({
-        code: new RegExp(`^${msgText}$`, 'i'),
-      });
-
-      if (!coupon) {
-        await sendMessageHelper(chat_id, '❌ Bunday kupon topilmadi.');
-        return;
-      }
-
-      await User.updateMany(
-        { 'coupons.coupon': coupon._id },
-        { $pull: { coupons: { coupon: coupon._id } } },
-      );
-
-      await sendMessageHelper(chat_id, `✅ Kupon ${coupon.code} o‘chirildi`);
-    },
-    middleware: ({ user }: BotContext): boolean => get(user, 'user_step') === 30,
-  },
-
-  '90': {
-    selfExecuteFn: async ({ chat_id, msgText }: BotContext): Promise<void> => {
-      const coupon = await Coupon.findOne({
-        code: { $regex: new RegExp(`^${msgText}$`, 'i') },
-      }).populate<{ userId: IUser }>('userId');
-      if (!coupon) {
-        await sendMessageHelper(chat_id, '❌ Kupon topilmadi.');
-        return;
-      }
-
-      if (coupon.wonAt) {
-        await sendMessageHelper(chat_id, '⚠️ Bu kupon allaqachon yutgan deb belgilangan.');
-        return;
-      }
-
-      const userInfo = `
-👤 Foydalanuvchi: ${coupon.userId.fullName || '-'}
-📞 Telefon: ${coupon.userId.phone ?? '-'}
-💬 Chat ID: ${coupon.userId.chat_id}
-Language : ${coupon.userId.language || '-'}
-`;
-
-      await sendMessageHelper(
-        chat_id,
-        `🎉 Kupon ${coupon.code} uchun yutuq textini yuboring.\n\n${userInfo}`,
-      );
-      await updateUser(chat_id, {
-        user_step: 91,
-      });
-    },
-    middleware: ({ user }: BotContext): boolean => get(user, 'user_step') === 90,
   },
 };

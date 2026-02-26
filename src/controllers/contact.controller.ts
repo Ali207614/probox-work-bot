@@ -2,7 +2,7 @@ import type { Message } from 'node-telegram-bot-api';
 import type TelegramBot from 'node-telegram-bot-api';
 import { User } from '../models/user.model';
 import { sendMessageHelper, updateStep } from '../utils/helper';
-import { option } from '../keyboards/keyboards';
+import { mainMenuUz, option } from '../keyboards/keyboards';
 import { HanaService } from '../sap/hana.service';
 import i18n from '../utils/i18n';
 import { SapService } from '../sap/sap-hana.service';
@@ -52,7 +52,7 @@ export class ContactController {
       );
 
       await bot.deleteMessage(chatId, loadingMsg.message_id);
-      await sendMessageHelper(chatId, i18n.__('messages.login_success'));
+      await sendMessageHelper(chatId, i18n.__('messages.login_success'), mainMenuUz);
       await updateStep(chatId, 10);
     } catch (err) {
       console.error('ContactController error:', err);

@@ -1,4 +1,4 @@
-import { ReplyKeyboardMarkup, InlineKeyboardMarkup } from 'node-telegram-bot-api';
+import type { ReplyKeyboardMarkup, InlineKeyboardMarkup } from 'node-telegram-bot-api';
 
 export interface IKeyboardButton {
   text: string;
