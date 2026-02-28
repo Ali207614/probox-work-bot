@@ -44,6 +44,7 @@
         "active_coupons": "✅ Faol kuponlaringiz:",
         "expired_coupons": "⌛ Muddati tugagan kuponlar:",
         "total_coupons": "📊 Umumiy kuponlar soni",
+        "slp_not_found": "❌ Operator topilmadi. Iltimos, keyinroq urinib ko‘ring yoki administratorga murojaat qiling."
         "choose_branch_activated_coupon": "\uD83C\uDF40 Kupon faollashtirish\n\nIltimos, qaysi filialimizdan kuponni olganingizni tanlang ⬇\uFE0F"
     },
 	"menu": {
