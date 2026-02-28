@@ -198,7 +198,7 @@ export class TextController {
       }
 
       const user = (await User.findOne({ chat_id: chatId }).lean()) as IUser | null;
-      const lang = normalizeLang(user?.language ?? 'uz');
+      const lang = normalizeLang('uz');
 
       // ✅ MAIN MENU: report
       if (text === '📊 Umumiy hisobot' || text === '📊 Общий отчет') {
