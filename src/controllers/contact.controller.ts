@@ -56,7 +56,7 @@ export class ContactController {
       await updateStep(chatId, 10);
     } catch (err) {
       console.error('ContactController error:', err);
-      await sendMessageHelper(chatId, i18n.__('messages.error'));
+      await sendMessageHelper(chatId, i18n.__('messages.error'), option);
     }
   }
 }
