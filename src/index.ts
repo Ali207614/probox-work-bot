@@ -9,7 +9,6 @@ import { ErrorController } from './controllers/error.controller';
 
 export async function startBot(): Promise<void> {
   try {
-    // 🔹 Mongo ulanishi
     await connectDB();
 
     const bot = config.bot;
@@ -23,6 +22,11 @@ export async function startBot(): Promise<void> {
     function isPrivateChat(msg: Message | CallbackQuery['message'] | undefined): boolean {
       return msg?.chat?.type === 'private';
     }
+
+    await bot.setMyCommands([
+      { command: 'start', description: 'Botni boshlash' },
+      { command: 'logout', description: 'Chiqish (session reset)' },
+    ]);
 
     function sendError(bot: TelegramBot, error: unknown): void {
       const message =

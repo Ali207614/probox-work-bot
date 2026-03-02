@@ -212,6 +212,18 @@ export class TextController {
         return;
       }
 
+      if (text === '/logout') {
+        const res = await User.deleteOne({ chat_id: chatId });
+
+        // keyboardni ham olib tashlaymiz
+        await sendMessageHelper(
+          chatId,
+          res.deletedCount ? '✅ Logout bo‘ldi. Profil o‘chirildi.' : 'ℹ️ Sizda profil topilmadi.',
+          option,
+        );
+        return;
+      }
+
       // default
       if (user?.slpCode) {
         await sendMessageHelper(chatId, i18n.__('messages.start'), mainMenuByLang(lang));
