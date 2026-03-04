@@ -151,8 +151,6 @@ async function sendUmumiyHisobot(bot: BotContext['bot'], chat_id: number): Promi
     return;
   }
 
-  // ✅ Loading
-
   try {
     const seller = String(user.slpCode).trim();
     if (!seller) {
@@ -161,10 +159,30 @@ async function sendUmumiyHisobot(bot: BotContext['bot'], chat_id: number): Promi
       await sendMessageHelper(chat_id, msg, userBtn());
       return;
     }
+
+    // ✅ slpRole → Lead field mapping
+    const roleFieldMap: Record<string, string> = {
+      Operator1: 'operator',
+      Seller: 'seller',
+      Scoring: 'scoring',
+    };
+
+    const matchField = roleFieldMap[user.slpRole ?? ''];
+
+    if (!matchField) {
+      const msg =
+        lang === 'ru'
+          ? `❌ Неизвестная роль: ${user.slpRole ?? 'null'}`
+          : `❌ Noma'lum rol: ${user.slpRole ?? 'null'}`;
+      await bot.deleteMessage(chat_id, loadingMsg.message_id);
+      await sendMessageHelper(chat_id, msg, userBtn());
+      return;
+    }
+
     const rows = await Lead.aggregate<StatusRow>([
       {
         $match: {
-          operator: seller,
+          [matchField]: seller, // ← dinamik field
           status: { $nin: ['Archived', null] },
         },
       },
@@ -177,13 +195,9 @@ async function sendUmumiyHisobot(bot: BotContext['bot'], chat_id: number): Promi
 
     const text = buildReportText({ lang, slpName, slpCode: +seller, total, rows });
 
-    // ✅ Loading o‘chirish
     await bot.deleteMessage(chat_id, loadingMsg.message_id);
-
-    // ✅ Natija
     await sendMessageHelper(chat_id, text, mainMenuByLang(lang));
   } catch (e) {
-    // loading o‘chirishga harakat qilamiz
     await bot.deleteMessage(chat_id, loadingMsg.message_id).catch(() => {});
     throw e;
   }
